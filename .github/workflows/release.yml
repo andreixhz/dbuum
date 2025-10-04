@@ -10,6 +10,9 @@ on:
         required: true
         type: string
 
+permissions:
+  contents: write
+
 jobs:
   build-and-release:
     runs-on: ubuntu-latest
@@ -54,51 +57,15 @@ jobs:
         tar -czf migration-database-binaries.tar.gz *
     
     - name: Upload release assets
-      uses: actions/upload-release-asset@v1
+      uses: softprops/action-gh-release@v1
+      with:
+        files: |
+          release/migration-database-binaries.tar.gz
+          release/migration-database-linux-x64
+          release/migration-database-windows-x64.exe
+          release/migration-database-macos-x64
+          release/checksums.txt
+        draft: false
+        prerelease: false
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        upload_url: ${{ github.event.release.upload_url }}
-        asset_path: ./release/migration-database-binaries.tar.gz
-        asset_name: migration-database-binaries.tar.gz
-        asset_content_type: application/gzip
-    
-    - name: Upload individual binaries
-      uses: actions/upload-release-asset@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        upload_url: ${{ github.event.release.upload_url }}
-        asset_path: ./release/migration-database-linux-x64
-        asset_name: migration-database-linux-x64
-        asset_content_type: application/octet-stream
-    
-    - name: Upload Windows binary
-      uses: actions/upload-release-asset@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        upload_url: ${{ github.event.release.upload_url }}
-        asset_path: ./release/migration-database-windows-x64.exe
-        asset_name: migration-database-windows-x64.exe
-        asset_content_type: application/octet-stream
-    
-    - name: Upload macOS binary
-      uses: actions/upload-release-asset@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        upload_url: ${{ github.event.release.upload_url }}
-        asset_path: ./release/migration-database-macos-x64
-        asset_name: migration-database-macos-x64
-        asset_content_type: application/octet-stream
-    
-    - name: Upload checksums
-      uses: actions/upload-release-asset@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        upload_url: ${{ github.event.release.upload_url }}
-        asset_path: ./release/checksums.txt
-        asset_name: checksums.txt
-        asset_content_type: text/plain

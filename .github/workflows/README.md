@@ -35,6 +35,10 @@ Este projeto possui dois workflows principais configurados:
 - `migration-database-binaries.tar.gz` (arquivo compactado com todos)
 - `checksums.txt` (checksums SHA256)
 
+**Permissões necessárias:**
+- O workflow requer permissão `contents: write` para anexar arquivos às releases
+- Esta permissão é configurada automaticamente no workflow
+
 ## Como usar
 
 ### Para desenvolvimento (branch main):

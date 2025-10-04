@@ -11,6 +11,9 @@ A powerful and flexible database migration tool built with Bun that allows you t
 - **Error Handling**: Robust error handling with detailed error reporting
 - **YAML Configuration**: Simple and readable configuration files
 - **High Performance**: Built with Bun for optimal performance
+- **TypeScript Support**: Full TypeScript support with type definitions
+- **Comprehensive Testing**: Extensive test suite with 95%+ coverage
+- **Cross-Platform**: Compile to standalone executables for Windows, Linux, and macOS
 
 ## 📋 Prerequisites
 
@@ -20,15 +23,27 @@ A powerful and flexible database migration tool built with Bun that allows you t
 
 ## 🛠️ Installation
 
+### Option 1: Clone and Install
+
 1. Clone the repository:
 ```bash
-git clone <repository-url>
+git clone https://github.com/andreixhz/dbuum.git
 cd migration-database
 ```
 
 2. Install dependencies:
 ```bash
 bun install
+```
+
+### Option 2: Use as Standalone Executable
+
+Download the pre-compiled executable for your platform from the [Releases](https://github.com/andreixhz/dbuum/releases) page.
+
+### Option 3: Global Installation (Coming Soon)
+
+```bash
+bun add -g migration-database
 ```
 
 ## 📖 Usage
@@ -42,7 +57,39 @@ bun start <config-file.yaml>
 ### Example Commands
 
 ```bash
+# Run migration with specific config
 bun start my-migration.yaml
+
+# Run example migration
+bun run start:01
+
+# Run in development mode with watch
+bun run dev exemples/01.yaml
+
+# Test database connection
+bun test-connection.js
+
+# Check data integrity
+bun check-data.js
+```
+
+### Development Commands
+
+```bash
+# Run tests
+bun test
+
+# Run tests with coverage
+bun run test:coverage
+
+# Run tests in watch mode
+bun run test:watch
+
+# Type checking
+bun run type-check
+
+# Development with auto-reload
+bun run dev
 ```
 
 ### Compilation
@@ -58,6 +105,12 @@ bun run compile-windows
 
 # Compile for Linux
 bun run compile-linux
+
+# Compile for all platforms
+bun run compile-all
+
+# Build release (type-check + test + compile)
+bun run build:release
 ```
 
 ## ⚙️ Configuration
@@ -113,7 +166,7 @@ migrations:
 
 #### Database Configuration
 
-- **adapter**: Database type (mariadb, postgres, mysql, etc.)
+- **adapter**: Database type (`mariadb`, `postgres`, `mysql`, etc.)
 - **host**: Database host
 - **port**: Database port
 - **user**: Database username
@@ -131,9 +184,32 @@ migrations:
 
 - **column**: Column name
 - **primary**: Whether this is the primary key (used for checkpointing)
+- **target_column**: Optional different target column name
 - **conversion**: Optional data type conversion
   - **type**: Source data type
   - **target_type**: Target data type
+
+#### Advanced Configuration
+
+You can also configure logging, checkpointing, and performance options:
+
+```yaml
+# Logging configuration
+logging:
+  level: info  # error, warn, info, debug
+  file: migration.log
+
+# Checkpoint configuration
+checkpoint:
+  file: checkpoint.json
+  autoSave: true
+
+# Performance configuration
+performance:
+  batchSize: 1000
+  maxRetries: 3
+  retryDelay: 1000
+```
 
 ### Supported Data Types
 
@@ -173,20 +249,90 @@ The tool provides real-time analytics including:
 - **Error Tracking**: Tracks and reports failed insertions
 - **Graceful Degradation**: Continues processing even if some records fail
 
+## 🔧 API Reference
+
+### Types
+
+```typescript
+interface DatabaseConfig {
+  adapter: string;
+  host: string;
+  port: number;
+  user: string;
+  password: string;
+  database: string;
+}
+
+interface MigrationConfig {
+  name: string;
+  table: {
+    source: string;
+    target: string;
+  };
+  columns: {
+    column: string;
+    primary: boolean;
+    target_column?: string;
+    conversion?: {
+      type: 'int' | 'boolean' | 'float' | 'text' | 'uuid' | 'bigint' | 'tinytext';
+      target_type?: 'int' | 'boolean' | 'float' | 'text' | 'uuid' | 'bigint' | 'tinytext';
+    };
+  }[];
+}
+
+interface AppConfig {
+  database: {
+    source: DatabaseConfig;
+    target: DatabaseConfig;
+  };
+  migrations: MigrationConfig[];
+  logging?: {
+    level: 'error' | 'warn' | 'info' | 'debug';
+    file?: string;
+  };
+  checkpoint?: {
+    file: string;
+    autoSave: boolean;
+  };
+  performance?: {
+    batchSize: number;
+    maxRetries: number;
+    retryDelay: number;
+  };
+}
+```
+
+### Core Functions
+
+- `configManager.loadFromFile(filePath: string)`: Load configuration from YAML file
+- `convertData(data: any, migration: MigrationConfig)`: Convert data types according to migration rules
+- `extractionQuery(migration: MigrationConfig)`: Generate SQL query for data extraction
+- `makeInsertQuery(data: any, migration: MigrationConfig)`: Generate SQL insert query
+- `saveInsertedIds(id: any, checkpointFile: string)`: Save processed record ID to checkpoint
+- `formatAnalytics(analytics: any, avgTime: number)`: Format analytics display
+
 ## 📁 Project Structure
 
 ```
 migration-database/
-├── index.ts              # Main migration logic
-├── insert.ts             # Example insert script
-├── types.ts              # TypeScript type definitions
-├── package.json          # Project dependencies and scripts
-├── tsconfig.json         # TypeScript configuration
-├── checkpoint.json       # Checkpoint file (created during migration)
-├── exemples/             # Example configuration files
-│   ├── 01.yaml
-│   └── 02.yaml
-└── README.md             # This file
+├── index.ts                    # Main migration logic
+├── types.ts                    # TypeScript type definitions
+├── src/                        # Source code modules
+│   ├── config.ts              # Configuration management
+│   ├── logger.ts              # Logging system
+│   ├── errorHandler.ts        # Error handling
+│   └── utils.ts               # Utility functions
+├── test/                       # Test suite
+│   ├── *.test.ts              # Individual test files
+│   └── setup.ts               # Test setup
+├── exemples/                   # Example configuration files
+│   ├── 01.yaml                # Basic example
+│   └── complete-example.yaml  # Complete example
+├── package.json               # Project dependencies and scripts
+├── tsconfig.json              # TypeScript configuration
+├── checkpoint.json            # Checkpoint file (created during migration)
+├── migration.log              # Migration log file
+└── README.md                  # This file
 ```
 
 ## 🤝 Contributing
@@ -205,9 +351,73 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 If you encounter any issues or have questions:
 
-1. Check the [Issues](https://github.com/your-username/migration-database/issues) page
+1. Check the [Issues](https://github.com/andreixhz/dbuum/issues) page
 2. Create a new issue with detailed information about your problem
 3. Include your configuration file (with sensitive data removed) and error logs
+
+## 🔧 Troubleshooting
+
+### Common Issues
+
+#### Database Connection Errors
+
+**Problem**: Cannot connect to source or target database
+**Solution**: 
+- Verify database credentials and network connectivity
+- Check if the database server is running
+- Ensure firewall allows connections on the specified port
+- Test connection using `bun test-connection.js`
+
+#### Data Type Conversion Errors
+
+**Problem**: Data conversion fails for specific columns
+**Solution**:
+- Check that source data matches the expected type
+- Verify conversion rules in your configuration
+- Use debug logging to see detailed conversion information
+
+#### Checkpoint Issues
+
+**Problem**: Migration doesn't resume from checkpoint
+**Solution**:
+- Check if `checkpoint.json` file exists and is readable
+- Verify that the primary key column is correctly configured
+- Delete checkpoint file to start fresh if needed
+
+#### Performance Issues
+
+**Problem**: Migration is slow or consuming too much memory
+**Solution**:
+- Adjust `batchSize` in performance configuration
+- Monitor system resources during migration
+- Consider running migrations during off-peak hours
+
+### Debug Mode
+
+Enable debug logging to get detailed information:
+
+```yaml
+logging:
+  level: debug
+  file: migration-debug.log
+```
+
+### FAQ
+
+**Q: Can I migrate between different database engines?**
+A: Yes, the tool supports migration between MySQL, PostgreSQL, MariaDB, and other SQL databases.
+
+**Q: What happens if the migration is interrupted?**
+A: The checkpoint system saves your progress. Simply run the same command again to resume from where it left off.
+
+**Q: Can I customize data transformations?**
+A: Currently, the tool supports basic data type conversions. Custom transformation functions are planned for future releases.
+
+**Q: Is it safe to run migrations on production data?**
+A: Always backup your data before running migrations. The tool includes checkpointing for safety, but backups are essential.
+
+**Q: How do I handle large datasets?**
+A: Use the `batchSize` configuration option to process data in smaller chunks and monitor system resources.
 
 ## 🔮 Roadmap
 
