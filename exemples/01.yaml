@@ -1,0 +1,64 @@
+database:
+  source:
+    adapter: mariadb
+    host: localhost
+    port: 3306
+    user: nl_user
+    password: 123
+    database: nl
+
+  target:
+    adapter: postgres
+    host: localhost
+    port: 5432
+    user: postgres
+    password: postgres
+    database: nl
+
+migrations:
+  - name: person_frames
+    table:
+      target: tb_person_frames
+      source: tb_person_frames
+    columns:
+      - column: id
+        primary: true
+
+      - column: camera_id
+      - column: yolo_id
+      - column: frame      
+      - column: proba_helmet
+      - column: proba_glove
+      - column: proba_boot
+      - column: proba_jumpsuit
+      - column: proba_jacket
+      - column: frame_position
+      - column: annotated_frame
+      - column: boxes
+
+      - column: uniform_color_laranja
+        conversion:
+          type: int
+          target_type: boolean
+
+      - column: uniform_color_azul
+        conversion:
+          type: int
+          target_type: boolean
+      - column: is_lying_down
+        conversion:
+          type: int
+          target_type: boolean
+    
+      - column: processed
+        conversion:
+          type: int
+          target_type: boolean
+      
+      - column: switch_turn
+        conversion:
+          type: int
+          target_type: boolean
+
+      - column: created_at
+      - column: updated_at

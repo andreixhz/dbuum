@@ -1,0 +1,111 @@
+# Complete Migration Example
+# This example shows all available configuration options
+
+database:
+  source:
+    adapter: mariadb
+    host: localhost
+    port: 3306
+    user: source_user
+    password: source_password
+    database: source_database
+
+  target:
+    adapter: postgres
+    host: localhost
+    port: 5432
+    user: target_user
+    password: target_password
+    database: target_database
+
+migrations:
+  # Example 1: Simple table migration with data type conversions
+  - name: users_migration
+    table:
+      target: users
+      source: users
+    columns:
+      - column: id
+        primary: true
+      
+      - column: username
+      - column: email
+      - column: full_name
+      
+      # Convert integer to boolean
+      - column: is_active
+        conversion:
+          type: int
+          target_type: boolean
+      
+      # Convert integer to boolean
+      - column: is_verified
+        conversion:
+          type: int
+          target_type: boolean
+      
+      - column: created_at
+      - column: updated_at
+
+  # Example 2: Complex migration with multiple data types
+  - name: products_migration
+    table:
+      target: products
+      source: products
+    columns:
+      - column: id
+        primary: true
+      
+      - column: name
+      - column: description
+      - column: sku
+      
+      # Convert integer to boolean
+      - column: in_stock
+        conversion:
+          type: int
+          target_type: boolean
+      
+      # Keep as float
+      - column: price
+      
+      # Convert to UUID
+      - column: category_id
+        conversion:
+          type: int
+          target_type: uuid
+      
+      # JSON data
+      - column: metadata
+      
+      - column: created_at
+      - column: updated_at
+
+  # Example 3: Migration with different table names
+  - name: orders_migration
+    table:
+      target: customer_orders
+      source: orders
+    columns:
+      - column: id
+        primary: true
+      
+      - column: customer_id
+      - column: order_number
+      
+      # Convert integer to boolean
+      - column: is_completed
+        conversion:
+          type: int
+          target_type: boolean
+      
+      # Convert integer to boolean
+      - column: is_cancelled
+        conversion:
+          type: int
+          target_type: boolean
+      
+      - column: total_amount
+      - column: order_date
+      - column: created_at
+      - column: updated_at

@@ -1,0 +1,50 @@
+{
+  "name": "migration-database",
+  "version": "1.0.0",
+  "description": "A powerful and flexible database migration tool built with Bun that allows you to migrate data between different database systems with support for data type conversions, checkpointing, and real-time analytics.",
+  "main": "index.ts",
+  "module": "index.ts",
+  "type": "module",
+  "keywords": [
+    "database",
+    "migration",
+    "bun",
+    "typescript",
+    "postgresql",
+    "mysql",
+    "mariadb",
+    "data-migration",
+    "etl"
+  ],
+  "author": "Your Name",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/your-username/migration-database.git"
+  },
+  "bugs": {
+    "url": "https://github.com/your-username/migration-database/issues"
+  },
+  "homepage": "https://github.com/your-username/migration-database#readme",
+  "scripts": {
+    "start": "bun index.ts",
+    "start:01": "bun index.ts exemples/01.yaml",
+    "start:02": "bun index.ts exemples/02.yaml",
+    "compile": "bun build index.ts --compile --outfile dbm",
+    "compile-windows": "bun build index.ts --compile --target=bun-windows-x64 --outfile dbm.exe",
+    "compile-linux": "bun build index.ts --compile --target=bun-linux-x64 --outfile dbm",
+    "test": "bun test test/index.test.ts",
+    "test:watch": "bun test --watch test/index.test.ts",
+    "test:coverage": "bun test --coverage test/index.test.ts",
+    "dev": "bun --watch index.ts"
+  },
+  "devDependencies": {
+    "@types/bun": "latest"
+  },
+  "peerDependencies": {
+    "typescript": "^5"
+  },
+  "engines": {
+    "bun": ">=1.0.0"
+  }
+}

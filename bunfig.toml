@@ -1,0 +1,4 @@
+[test]
+# Configuration for Bun test runner
+preload = ["./test/setup.ts"]
+timeout = 30000
